@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - FotoRank</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .dashboard {
+            padding: 2rem;
+        }
+        
+        .welcome {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #6366f1;
+        }
+        
+        .user-nav {
+            background: white;
+            padding: 1rem 2rem;
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .user-nav a {
+            color: #6366f1;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .user-nav a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="logo">FotoRank</div>
+            <nav class="nav">
+                <span id="userEmail" style="margin-right: 20px;"></span>
+                <a href="#" id="logoutBtn">Sair</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container dashboard">
+        <div class="welcome">
+            <h1>Bem-vindo ao FotoRank!</h1>
+            <p>Você está logado com sucesso.</p>
+        </div>
+        
+        <div class="user-nav">
+            <a href="#">VOTAR</a>
+            <a href="#">MEUS TESTES</a>
+            <a href="#">CRÉDITOS</a>
+            <a href="#">CONFIGURAÇÕES</a>
+            <a href="#">RELATÓRIO ESPECIAL</a>
+        </div>
+        
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number">150</div>
+                <div>Créditos</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">15</div>
+                <div>Karma</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">0</div>
+                <div>Testes Ativos</div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+        
+        const supabaseUrl = 'https://xsmnkhfhiggaqykehysi.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhzbW5raGZoaWdnYXF5a2VoeXNpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI5ODgxMTMsImV4cCI6MjA2ODU2NDExM30.xQLCUpjfLguTweV9AQbTNHyI74F1oTj_zzBvCgbO3C8';
+        const supabase = createClient(supabaseUrl, supabaseKey);
+        
+        // Verificar se está logado
+        const { data: { user } } = await supabase.auth.getUser();
+        
+        if (!user) {
+            window.location.href = 'login.html';
+        } else {
+            document.getElementById('userEmail').textContent = user.email;
+        }
+        
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            await supabase.auth.signOut();
+            window.location.href = 'index.html';
+        });
+    </script>
+</body>
+</html>
