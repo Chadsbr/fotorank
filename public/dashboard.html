@@ -78,8 +78,8 @@
         </div>
         
         <div class="user-nav">
-            <a href="#">VOTAR</a>
-            <a href="#">MEUS TESTES</a>
+    <a href="#">VOTAR</a>
+    <a href="upload.html">MEUS TESTES</a>
             <a href="#">CRÉDITOS</a>
             <a href="#">CONFIGURAÇÕES</a>
             <a href="#">RELATÓRIO ESPECIAL</a>
@@ -102,26 +102,48 @@
     </div>
 
     <script type="module">
-        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+    
+    const supabaseUrl = 'https://xsmnkhfhiggaqykehysi.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhzbW5raGZoaWdnYXF5a2VoeXNpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI5ODgxMTMsImV4cCI6MjA2ODU2NDExM30.xQLCUpjfLguTweV9AQbTNHyI74F1oTj_zzBvCgbO3C8';
+    const supabase = createClient(supabaseUrl, supabaseKey);
+    
+    // Verificar se está logado
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+        window.location.href = 'login.html';
+    } else {
+        document.getElementById('userEmail').textContent = user.email;
         
-        const supabaseUrl = 'https://xsmnkhfhiggaqykehysi.supabase.co';
-        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhzbW5raGZoaWdnYXF5a2VoeXNpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI5ODgxMTMsImV4cCI6MjA2ODU2NDExM30.xQLCUpjfLguTweV9AQbTNHyI74F1oTj_zzBvCgbO3C8';
-        const supabase = createClient(supabaseUrl, supabaseKey);
-        
-        // Verificar se está logado
-        const { data: { user } } = await supabase.auth.getUser();
-        
-        if (!user) {
-            window.location.href = 'login.html';
-        } else {
-            document.getElementById('userEmail').textContent = user.email;
+        // Buscar dados do perfil
+        const { data: profile } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', user.id)
+            .single();
+            
+        if (profile) {
+            // Atualizar os valores reais
+            document.querySelector('.stats .stat-card:nth-child(1) .stat-number').textContent = profile.credits;
+            document.querySelector('.stats .stat-card:nth-child(2) .stat-number').textContent = profile.karma;
+            
+            // Contar testes ativos
+            const { count } = await supabase
+                .from('photos')
+                .select('*', { count: 'exact', head: true })
+                .eq('user_id', user.id)
+                .eq('status', 'approved');
+                
+            document.querySelector('.stats .stat-card:nth-child(3) .stat-number').textContent = count || 0;
         }
-        
-        // Logout
-        document.getElementById('logoutBtn').addEventListener('click', async () => {
-            await supabase.auth.signOut();
-            window.location.href = 'index.html';
-        });
-    </script>
+    }
+    
+    // Logout
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+        await supabase.auth.signOut();
+        window.location.href = 'index.html';
+    });
+</script>
 </body>
 </html>
